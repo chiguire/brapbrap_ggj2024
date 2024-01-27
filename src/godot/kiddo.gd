@@ -8,12 +8,29 @@ extends Node2D
 export var configPath : NodePath
 export var cameraPath : NodePath
 export var statePath : NodePath
+
+export var neck_angle : float = PI/3.0
+export var shoulder_angle : float = PI/6.0
+export var mouth_angle : float = PI/4.0
+export var mouth_radius_factor : float = 0.4
+export var eye_separation_factor : float = 0.5
+export var eye_level_factor : float = 0.224
+export var eye_size_factor : float = 0.392
+export var eye_aspect_ratio : float = 0.603
+export var eye_openness : float = 1.0
  
+export var openness_text : NodePath
+var openness_node : Label
+
 var colors : Array = []
 var camera : Camera2D = null
 var stroke_width = 10
 
 var emotion_happycry = 0
+
+var openness_noise = OpenSimplexNoise.new()
+
+var timer = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -24,12 +41,20 @@ func _ready():
 	
 	camera.zoom = Vector2(1.25, 1.25)
 	
+	openness_noise.seed = randi()
+	openness_noise.octaves = 4
+	openness_noise.period = 5.0
+	openness_noise.persistence = 0.8
+	
+	openness_node = get_node(openness_text)
+	
 	var state = get_node(statePath).connect("emotion_update", self, "emotion_update_handler")
 
 func emotion_update_handler(p_emotion_happycry):
 	emotion_happycry = p_emotion_happycry
 	
 func _process(delta):
+	timer += delta
 	update()
 
 func _draw():
@@ -48,8 +73,6 @@ func draw_body(head_radius):
 	draw_polyline(body, colors[1], stroke_width, true)
 	
 func get_body(head_radius):
-	var neck_angle = PI/3.0
-	var shoulder_angle = PI/6.0
 	var origin = Vector2.ZERO
 	
 	var left_top_neck = origin + Vector2(cos(PI+neck_angle), -sin(PI+neck_angle))*head_radius
@@ -74,8 +97,6 @@ func draw_head(head_radius):
 	draw_arc(Vector2.ZERO, head_radius, 0, 2*PI, 50, colors[1], stroke_width, true)
 	
 func draw_mouth(head_radius):
-	var mouth_angle = PI/4.0
-	var mouth_radius_factor = 0.4
 	var mouth_middle_left = Vector2(cos(PI+mouth_angle), -sin(PI+mouth_angle)) * head_radius * mouth_radius_factor
 	var mouth_middle_right = Vector2(cos(-mouth_angle), -sin(-mouth_angle)) * head_radius * mouth_radius_factor
 	var mouth_top_left = mouth_middle_left - Vector2(0, head_radius * 0.4)
@@ -136,7 +157,39 @@ func draw_nose(head_radius):
 	draw_circle(Vector2(head_radius*0.03, 0), head_radius*0.02, colors[1])
 	
 func draw_eyes(head_radius):
-	pass
+	eye_openness = (openness_noise.get_noise_1d(timer)+1)*0.5
+	var eye_openness_factor = min(max(0, eye_openness), 1)
+	openness_node.text = "%s" % eye_openness_factor
+	
+	var left_center = Vector2(-head_radius * eye_separation_factor, -head_radius * eye_level_factor)
+	var left_size = Vector2(head_radius*eye_size_factor, head_radius*eye_size_factor*eye_aspect_ratio)
+	var left_eye_pos = Vector2.ZERO
+	
+	var right_center = Vector2(head_radius * eye_separation_factor, -head_radius * eye_level_factor)
+	var right_size = left_size
+	var right_eye_pos = Vector2.ZERO
+	
+	if (emotion_happycry >= 0.5 || emotion_happycry <= -0.5):
+		draw_eye_excited(left_center, left_size)
+		draw_eye_excited(right_center, right_size)
+	else:
+		if (eye_openness_factor > 0.35):
+			draw_eye(left_center, left_size, left_eye_pos)
+			draw_eye(right_center, right_size, right_eye_pos)
+		else:
+			draw_eye_closed(left_center, left_size)
+			draw_eye_closed(right_center, right_size)
+	
+func draw_eye(center:Vector2, size:Vector2, eye_pos:Vector2):
+	draw_rect(Rect2(center.x - size.x/2, center.y - size.y/2, size.x, size.y), colors[0], true)
+	draw_rect(Rect2(center.x - size.x/2, center.y - size.y/2, size.x, size.y), colors[1], false, stroke_width, true)
+	draw_circle(Vector2(center.x + eye_pos.x, center.y + eye_pos.y), size.y/2, colors[1])
+	
+func draw_eye_excited(center:Vector2, size:Vector2):
+	draw_arc(center, size.x/1.9, 0, -PI, 16, colors[1], stroke_width*2, true)
+
+func draw_eye_closed(center:Vector2, size:Vector2):
+	draw_line(center - Vector2(size.x/2, 0), center + Vector2(size.x/2, 0), colors[1], stroke_width, true)
 	
 func draw_eyebrows(head_radius):
 	pass

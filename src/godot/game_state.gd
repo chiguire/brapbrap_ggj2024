@@ -37,4 +37,9 @@ func _process(delta):
 	emotion_happycry = sin(timer*2-1.0)
 	label_node.text = "%s" % emotion_happycry
 	
+	if (emotion_happycry > 0):
+		VisualServer.set_default_clear_color(Color.red)
+	else:
+		VisualServer.set_default_clear_color(Color.purple)
+	
 	emit_signal("emotion_update", emotion_happycry)

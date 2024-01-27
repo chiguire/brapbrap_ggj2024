@@ -11,6 +11,8 @@ script = ExtResource( 2 )
 configPath = NodePath("../config")
 cameraPath = NodePath("../cam")
 statePath = NodePath("../game_state")
+eye_separation_factor = 0.355
+openness_text = NodePath("../Container/openness_label")
 
 [node name="config" type="Node" parent="."]
 script = ExtResource( 1 )
@@ -23,13 +25,16 @@ current = true
 script = ExtResource( 3 )
 label_text = NodePath("../Container/timer_label")
 
-[node name="Container" type="Container" parent="."]
+[node name="Container" type="VFlowContainer" parent="."]
 margin_left = -506.0
 margin_top = -268.0
 margin_right = 511.0
 margin_bottom = 325.0
 
 [node name="timer_label" type="Label" parent="Container"]
-margin_right = 40.0
 margin_bottom = 14.0
 custom_colors/font_color = Color( 0, 0, 0, 1 )
+
+[node name="openness_label" type="Label" parent="Container"]
+margin_top = 18.0
+margin_bottom = 32.0
