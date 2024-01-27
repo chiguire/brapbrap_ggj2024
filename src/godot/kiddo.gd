@@ -38,6 +38,9 @@ func _draw():
 	draw_body(head_radius)
 	draw_head(head_radius)
 	draw_mouth(head_radius)
+	draw_nose(head_radius)
+	draw_eyes(head_radius)
+	draw_eyebrows(head_radius)
 	
 func draw_body(head_radius):
 	var body = get_body(head_radius)
@@ -71,8 +74,8 @@ func draw_head(head_radius):
 	draw_arc(Vector2.ZERO, head_radius, 0, 2*PI, 50, colors[1], stroke_width, true)
 	
 func draw_mouth(head_radius):
-	var mouth_angle = PI/6.0
-	var mouth_radius_factor = 0.5
+	var mouth_angle = PI/4.0
+	var mouth_radius_factor = 0.4
 	var mouth_middle_left = Vector2(cos(PI+mouth_angle), -sin(PI+mouth_angle)) * head_radius * mouth_radius_factor
 	var mouth_middle_right = Vector2(cos(-mouth_angle), -sin(-mouth_angle)) * head_radius * mouth_radius_factor
 	var mouth_top_left = mouth_middle_left - Vector2(0, head_radius * 0.4)
@@ -128,3 +131,12 @@ func draw_mouth(head_radius):
 			
 		draw_polyline(points, colors[1], stroke_width, true)
 		
+func draw_nose(head_radius):
+	draw_circle(Vector2(-head_radius*0.03, 0), head_radius*0.02, colors[1])
+	draw_circle(Vector2(head_radius*0.03, 0), head_radius*0.02, colors[1])
+	
+func draw_eyes(head_radius):
+	pass
+	
+func draw_eyebrows(head_radius):
+	pass
