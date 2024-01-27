@@ -1,0 +1,6 @@
+{
+    "board": "arduino:avr:circuitplay32u4cat",
+    "programmer": "avrisp",
+    "port": "COM7",
+    "sketch": "src\\research\\floravib\\floravib.ino"
+}
