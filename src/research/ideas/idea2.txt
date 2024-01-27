@@ -2,4 +2,32 @@ GLOBAL GAME JAM 2024
 ATTEMPT #2
 Theme: Make Me Laugh
 
-You are: a parent, you are also a shapeshifter who doesn't have control of their ability. There
+You are: a parent, you are also a shapeshifter who doesn't have control of their ability. You sometimes are a charming creature, and other times you might look overwhelming or even scary.
+
+Your baby will keep looking at you, but cannot find if you cover your face. So, by playing peek-a-boo, your objective is to make your baby laugh as much as possible.
+
+Your baby has emotions, which we will put as a square:
+
+v- Laughing  Curious -v
+*---------------------*
+|                     |
+|                     |
+|                     |
+|          *          |
+|        Neutral      |
+|                     |
+|                     |
+*---------------------*
+^- Confused   Crying -^
+
+The face your baby makes is a function of where their emotions are in this chart. See accompanying picture for examples of how the face would look.
+
+We'll use Godot 3.5 for this game. We will also use the Leap Motion plugin for Godot to use the controller. We'll use a 2D screen to draw the baby's face procedurally.
+
+For this jam, the baby's face is made of these parts:
+
+* A round circle, the head
+* A box with curves, the mouth
+* Two small circles, the nose
+* Two medium circles, the eyes, with pupils
+* Two lines that angle, the eyebrows
