@@ -92,7 +92,8 @@ func _process(delta):
 	update()
 
 func _draw():
-	var head_radius = 600*0.5
+	var zoom_factor = camera.get_viewport().get_visible_rect().size.y/600
+	var head_radius = 600*0.5*zoom_factor
 	face_offset = Vector2(0, head_radius*face_offset_y_factor)
 	
 	draw_aura(head_radius)

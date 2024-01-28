@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://config.gd" type="Script" id=1]
 [ext_resource path="res://kiddo.gd" type="Script" id=2]
@@ -6,6 +6,14 @@
 [ext_resource path="res://shapeshifter_border.gd" type="Script" id=4]
 [ext_resource path="res://background.gd" type="Script" id=5]
 [ext_resource path="res://addons/gdleapmotion/gdlm_sensor.gdns" type="Script" id=6]
+
+[sub_resource type="DynamicFontData" id=1]
+font_path = "res://ARLRDBD.TTF"
+
+[sub_resource type="DynamicFont" id=2]
+size = 48
+outline_color = Color( 0, 0, 0, 1 )
+font_data = SubResource( 1 )
 
 [node name="main_scene" type="Node2D"]
 
@@ -29,10 +37,10 @@ config_path = NodePath("../config")
 state_path = NodePath("../game_state")
 
 [node name="Container" type="VFlowContainer" parent="."]
-margin_left = -506.0
-margin_top = -268.0
-margin_right = 511.0
-margin_bottom = 325.0
+margin_left = -435.0
+margin_top = 86.0
+margin_right = 395.0
+margin_bottom = 221.0
 
 [node name="timer_label" type="Label" parent="Container"]
 margin_bottom = 14.0
@@ -50,6 +58,21 @@ script = ExtResource( 1 )
 [node name="game_state" type="Node" parent="."]
 script = ExtResource( 3 )
 label_text = NodePath("../Container/timer_label")
+laugh_timer_label_path = NodePath("../MarginContainer/laugh_timer_label")
 
 [node name="leap_motion" type="Spatial" parent="."]
 script = ExtResource( 6 )
+
+[node name="MarginContainer" type="VFlowContainer" parent="."]
+margin_left = -476.0
+margin_top = -277.0
+margin_right = 400.0
+margin_bottom = -148.0
+
+[node name="laugh_timer_label" type="Label" parent="MarginContainer"]
+margin_right = 12.0
+margin_bottom = 2.0
+custom_colors/font_color = Color( 0.882353, 0.6, 0.12549, 1 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "Hello There!"

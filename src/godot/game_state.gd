@@ -19,6 +19,11 @@ var shape_noise = OpenSimplexNoise.new()
 var timer = 0
 var uncover_timer : float = 0
 
+var time_laughed : float = 0
+var time_cried : float = 0
+export var laugh_timer_label_path : NodePath
+var laugh_timer_label : Label
+
 signal emotion_update(happycry)
 signal shapeshifter_update(friendlyscary)
 signal baby_looked_at(enabled)
@@ -32,6 +37,8 @@ func _ready():
 	shape_noise.persistence = 0.2
 	label_node = get_node(label_text)
 	label_node.visible = false
+	
+	laugh_timer_label = get_node(laugh_timer_label_path)
 	startGame()
 
 func startGame():
@@ -61,7 +68,14 @@ func _process(delta):
 		interact_with_kiddo()
 		baby_looked = true
 	
+	if (emotion_happycry > 0.5):
+		time_laughed += delta
+		
+	if (emotion_happycry < -0.5):
+		time_cried += delta
+	
 	label_node.text = "happycry: %s\nshape_friendlyscary: %s\ncover: (%s, %s)" % [emotion_happycry, shape_friendlyscary, left_hand_cover, right_hand_cover]
+	laugh_timer_label.text = "Time Laughing: %.2f\nTime Crying: %.2f" % [time_laughed, time_cried]
 	
 	emit_signal("emotion_update", emotion_happycry)
 	emit_signal("shapeshifter_update", shape_friendlyscary)

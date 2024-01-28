@@ -4,7 +4,7 @@ A game made for the Global Game Jam 2024, from Goldsmiths @ London, with care. J
 
 Made by Ciro Durán <ciro.duran@gmail.com> (@[chiguire](https://twitter.com/chiguire) on Twitter)
 
-For ...
+For Luca and Marco.
 
 ## About this repo
 
