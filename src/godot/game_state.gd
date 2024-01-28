@@ -12,6 +12,9 @@ export var left_hand_cover : float = 1.0
 export var right_hand_cover : float = 1.0
 export var cover_threshold : float = 0.5
 
+export var leap_motion_path : NodePath
+#var leap_motion : GDLMSensor
+
 export var label_text : NodePath
 var label_node : Label
 
@@ -39,6 +42,7 @@ func _ready():
 	label_node.visible = false
 	
 	laugh_timer_label = get_node(laugh_timer_label_path)
+	#leap_motion = get_node(leap_motion_path)
 	startGame()
 
 func startGame():
