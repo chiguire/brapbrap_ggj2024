@@ -15,11 +15,12 @@ export var shoulder_angle : float = 0.449
 export var mouth_angle : float = 0.835
 export var mouth_radius_factor : float = 0.578
 export var nose_level_factor : float = 0.092
-export var eye_separation_factor : float = 0.5
+export var eye_separation_factor : float = 0.384
 export var eye_level_factor : float = 0.224
 export var eye_size_factor : float = 0.509
 export var eye_aspect_ratio : float = 0.587
 export var eye_openness : float = 1.0
+export var face_offset_y_factor : float = 0.329
  
 export var openness_text : NodePath
 var openness_node : Label
@@ -35,6 +36,7 @@ var openness_noise = OpenSimplexNoise.new()
 var timer = 0
 
 var eyebrow_angle_curve : Curve
+var face_offset : Vector2
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -66,6 +68,7 @@ func _ready():
 	#ps.append(1.0)
 	#print("ps: %s" % ",".join(ps))
 	#print("ps2: %s" % ",".join(ps2))
+	face_offset = Vector2.ZERO
 	
 	get_node(statePath).connect("emotion_update", self, "emotion_update_handler")
 
@@ -78,6 +81,7 @@ func _process(delta):
 
 func _draw():
 	var head_radius = 600*0.5
+	face_offset = Vector2(0, head_radius*face_offset_y_factor)
 	
 	draw_aura(head_radius)
 	draw_body(head_radius)
@@ -92,9 +96,10 @@ func draw_aura(head_radius):
 	var n_angle = 2.0*PI/n_points
 	var starting_angle = timer*0.2 + sin(timer)
 	var points = []
+	var extremeness_factor = lerp(0.5, 1.0, clamp(max(abs(emotion_happycry), 0.5)*2-1, 0, 1))
 	for i in range(n_points):
-		points.append(Vector2(0, head_radius*aura_factor).rotated(starting_angle+n_angle*i))
-		points.append(Vector2(0, head_radius*aura_factor*0.8).rotated(starting_angle+n_angle*0.5+n_angle*i))
+		points.append(Vector2(0, head_radius*aura_factor*extremeness_factor).rotated(starting_angle+n_angle*i))
+		points.append(Vector2(0, head_radius*aura_factor*0.7*extremeness_factor).rotated(starting_angle+n_angle*0.5+n_angle*i))
 	
 	var color = colors[2].linear_interpolate(colors[3], emotion_happycry*0.5+0.5)
 	print("ps: %s" % ",".join(points))
@@ -136,8 +141,8 @@ func draw_head(head_radius):
 	draw_arc(Vector2.ZERO, head_radius, 0, 2*PI, 50, colors[1], stroke_width, true)
 	
 func draw_mouth(head_radius):
-	var mouth_middle_left = Vector2(cos(PI+mouth_angle), -sin(PI+mouth_angle)) * head_radius * mouth_radius_factor
-	var mouth_middle_right = Vector2(cos(-mouth_angle), -sin(-mouth_angle)) * head_radius * mouth_radius_factor
+	var mouth_middle_left = Vector2(cos(PI+mouth_angle), -sin(PI+mouth_angle)) * head_radius * mouth_radius_factor + face_offset
+	var mouth_middle_right = Vector2(cos(-mouth_angle), -sin(-mouth_angle)) * head_radius * mouth_radius_factor + face_offset
 	var mouth_top_left = mouth_middle_left - Vector2(0, head_radius * 0.4)
 	var mouth_top_right = mouth_middle_right - Vector2(0, head_radius * 0.4)
 	var mouth_bottom_left = mouth_middle_left + Vector2(0, head_radius * 0.4)
@@ -198,19 +203,19 @@ func draw_mouth(head_radius):
 		
 func draw_nose(head_radius):
 	var y = head_radius * nose_level_factor
-	draw_circle(Vector2(-head_radius*0.03, y), head_radius*0.02, colors[1])
-	draw_circle(Vector2(head_radius*0.03, y), head_radius*0.02, colors[1])
+	draw_circle(Vector2(-head_radius*0.03, y) + face_offset, head_radius*0.02, colors[1])
+	draw_circle(Vector2(head_radius*0.03, y) + face_offset, head_radius*0.02, colors[1])
 	
 func draw_eyes(head_radius):
 	eye_openness = (openness_noise.get_noise_1d(timer)+1)*0.5
 	var eye_openness_factor = min(max(0, eye_openness), 1)
 	openness_node.text = "eye open: %s" % eye_openness_factor
 	
-	var left_center = Vector2(-head_radius * eye_separation_factor, -head_radius * eye_level_factor)
+	var left_center = Vector2(-head_radius * eye_separation_factor, -head_radius * eye_level_factor) + face_offset
 	var left_size = Vector2(head_radius*eye_size_factor, head_radius*eye_size_factor*eye_aspect_ratio)
 	var left_eye_pos = Vector2.ZERO
 	
-	var right_center = Vector2(head_radius * eye_separation_factor, -head_radius * eye_level_factor)
+	var right_center = Vector2(head_radius * eye_separation_factor, -head_radius * eye_level_factor) + face_offset
 	var right_size = left_size
 	var right_eye_pos = Vector2.ZERO
 	
