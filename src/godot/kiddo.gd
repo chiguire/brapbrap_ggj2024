@@ -14,14 +14,14 @@ export var neck_angle : float = 0.844
 export var shoulder_angle : float = 0.449
 export var mouth_angle : float = 0.835
 export var mouth_radius_factor : float = 0.578
-export var nose_level_factor : float = 0.092
+export var nose_level_factor : float = 0.16
 export var eye_separation_factor : float = 0.384
 export var eye_level_factor : float = 0.224
 export var eye_size_factor : float = 0.509
 export var eye_aspect_ratio : float = 0.587
 export var eye_openness : float = 1.0
 export var face_offset_y_factor : float = 0.329
- 
+
 export var openness_text : NodePath
 var openness_node : Label
 
@@ -30,6 +30,7 @@ var camera : Camera2D = null
 var stroke_width = 10
 
 var emotion_happycry = 0
+var baby_looked = false
 
 var openness_noise = OpenSimplexNoise.new()
 
@@ -53,6 +54,7 @@ func _ready():
 	openness_noise.persistence = 0.3
 	
 	openness_node = get_node(openness_text)
+	openness_node.visible = false
 	
 	eyebrow_angle_curve = Curve.new()
 	eyebrow_angle_curve.add_point(Vector2(0, 1), 2, -2, Curve.TANGENT_FREE, Curve.TANGENT_FREE)
@@ -71,9 +73,13 @@ func _ready():
 	face_offset = Vector2.ZERO
 	
 	get_node(statePath).connect("emotion_update", self, "emotion_update_handler")
+	get_node(statePath).connect("baby_looked_at", self, "baby_looked_at_handler")
 
 func emotion_update_handler(p_emotion_happycry):
 	emotion_happycry = p_emotion_happycry
+	
+func baby_looked_at_handler(p_baby_looked):
+	baby_looked = p_baby_looked
 	
 func _process(delta):
 	timer += delta
@@ -102,7 +108,6 @@ func draw_aura(head_radius):
 		points.append(Vector2(0, head_radius*aura_factor*0.7*extremeness_factor).rotated(starting_angle+n_angle*0.5+n_angle*i))
 	
 	var color = colors[2].linear_interpolate(colors[3], emotion_happycry*0.5+0.5)
-	print("ps: %s" % ",".join(points))
 	draw_colored_polygon(points, color)
 	
 func draw_body(head_radius):
@@ -215,9 +220,12 @@ func draw_eyes(head_radius):
 	var left_size = Vector2(head_radius*eye_size_factor, head_radius*eye_size_factor*eye_aspect_ratio)
 	var left_eye_pos = Vector2.ZERO
 	
+	if !baby_looked:
+		left_eye_pos = Vector2(openness_noise.get_noise_1d(timer)*30, 0)
+	
 	var right_center = Vector2(head_radius * eye_separation_factor, -head_radius * eye_level_factor) + face_offset
 	var right_size = left_size
-	var right_eye_pos = Vector2.ZERO
+	var right_eye_pos = left_eye_pos
 	
 	if (emotion_happycry >= 0.5 || emotion_happycry <= -0.5):
 		draw_eye_excited(left_center, left_size)

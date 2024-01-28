@@ -23,6 +23,7 @@ openness_text = NodePath("../Container/openness_label")
 
 [node name="shapeshifter_border" type="Node2D" parent="."]
 script = ExtResource( 4 )
+camera_path = NodePath("../cam")
 config_path = NodePath("../config")
 state_path = NodePath("../game_state")
 

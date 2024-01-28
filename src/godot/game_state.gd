@@ -8,37 +8,64 @@ export var emotion_happycry : float = 0
 
 export var shape_friendlyscary : float = 0
 
-export var left_hand_cover : float = 0
-export var right_hand_cover : float = 0
+export var left_hand_cover : float = 1.0
+export var right_hand_cover : float = 1.0
+export var cover_threshold : float = 0.5
 
 export var label_text : NodePath
 var label_node : Label
 
 var shape_noise = OpenSimplexNoise.new()
 var timer = 0
+var uncover_timer : float = 0
 
 signal emotion_update(happycry)
 signal shapeshifter_update(friendlyscary)
+signal baby_looked_at(enabled)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	shape_noise.seed = randi()
-	shape_noise.octaves = 4
-	shape_noise.period = 20.0
-	shape_noise.persistence = 0.8
+	shape_noise.octaves = 2
+	shape_noise.period = 1.0
+	shape_noise.persistence = 0.2
 	label_node = get_node(label_text)
+	startGame()
 
 func startGame():
 	timer = 0
+	emotion_happycry = 0 + randf()*0.1
 	shape_friendlyscary = shape_noise.get_noise_1d(timer)
-
+	left_hand_cover = 1.0
+	right_hand_cover = 1.0
+	
 func _process(delta):
 	timer += delta*0.3
 	clamp(emotion_happycry, -1, 1)
-	shape_friendlyscary = shape_noise.get_noise_1d(timer)
 	
-	label_node.text = "happycry: %s\nshape_friendlyscary: %s" % [emotion_happycry, shape_friendlyscary]
+	if (Input.is_action_pressed("ui_accept")):
+		left_hand_cover = 0.0
+		right_hand_cover = 0.0
+		uncover_timer += delta
+	else:
+		left_hand_cover = 1.0
+		right_hand_cover = 1.0
+		uncover_timer = 0
+		shape_friendlyscary = shape_noise.get_noise_1d(timer)*2
+		emotion_happycry = emotion_happycry * 0.9998
+		
+	var baby_looked = false
+	if (left_hand_cover <= cover_threshold):
+		interact_with_kiddo(delta)
+		baby_looked = true
+	
+	label_node.text = "happycry: %s\nshape_friendlyscary: %s\ncover: (%s, %s)" % [emotion_happycry, shape_friendlyscary, left_hand_cover, right_hand_cover]
 	
 	emit_signal("emotion_update", emotion_happycry)
 	emit_signal("shapeshifter_update", shape_friendlyscary)
+	emit_signal("baby_looked_at", baby_looked)
 
+func interact_with_kiddo(delta):
+	var e = Vector2(emotion_happycry, 0)
+	var s = Vector2(shape_friendlyscary, 0)
+	emotion_happycry = e.move_toward(s, uncover_timer*0.02).x
