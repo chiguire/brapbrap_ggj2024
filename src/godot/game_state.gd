@@ -3,6 +3,7 @@ extends Node
 
 # emotion and shape are 
 
+# this value is 1.0 when baby is absolutely happy, -1.0 when baby is desperately crying
 export var emotion_happycry : float = 0
 
 export var shape_friendlyscary : float = 0
@@ -17,6 +18,7 @@ var shape_noise = OpenSimplexNoise.new()
 var timer = 0
 
 signal emotion_update(happycry)
+signal shapeshifter_update(friendlyscary)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -32,14 +34,11 @@ func startGame():
 
 func _process(delta):
 	timer += delta*0.3
+	clamp(emotion_happycry, -1, 1)
 	shape_friendlyscary = shape_noise.get_noise_1d(timer)
 	
-	emotion_happycry = sin(timer*2-1.0)
-	label_node.text = "%s" % emotion_happycry
-	
-	if (emotion_happycry > 0):
-		VisualServer.set_default_clear_color(Color.red)
-	else:
-		VisualServer.set_default_clear_color(Color.purple)
+	label_node.text = "happycry: %s\nshape_friendlyscary: %s" % [emotion_happycry, shape_friendlyscary]
 	
 	emit_signal("emotion_update", emotion_happycry)
+	emit_signal("shapeshifter_update", shape_friendlyscary)
+

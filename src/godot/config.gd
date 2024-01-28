@@ -4,7 +4,7 @@ extends Node
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
-export var colors = [Color.white, Color.black, Color.red]
+export var colors = [Color.white, Color.black, Color.red, Color.blue]
 export var stroke_width = 10
 
 # Called when the node enters the scene tree for the first time.
