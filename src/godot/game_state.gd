@@ -22,6 +22,7 @@ var uncover_timer : float = 0
 signal emotion_update(happycry)
 signal shapeshifter_update(friendlyscary)
 signal baby_looked_at(enabled)
+signal hands_update(left_hand_cover, right_hand_cover)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -30,6 +31,7 @@ func _ready():
 	shape_noise.period = 1.0
 	shape_noise.persistence = 0.2
 	label_node = get_node(label_text)
+	label_node.visible = false
 	startGame()
 
 func startGame():
@@ -41,7 +43,7 @@ func startGame():
 	
 func _process(delta):
 	timer += delta*0.3
-	clamp(emotion_happycry, -1, 1)
+	emotion_happycry = clamp(emotion_happycry, -1, 1)
 	
 	if (Input.is_action_pressed("ui_accept")):
 		left_hand_cover = 0.0
@@ -52,11 +54,11 @@ func _process(delta):
 		right_hand_cover = 1.0
 		uncover_timer = 0
 		shape_friendlyscary = shape_noise.get_noise_1d(timer)*2
-		emotion_happycry = emotion_happycry * 0.9998
+		emotion_happycry = emotion_happycry * 0.998
 		
 	var baby_looked = false
 	if (left_hand_cover <= cover_threshold):
-		interact_with_kiddo(delta)
+		interact_with_kiddo()
 		baby_looked = true
 	
 	label_node.text = "happycry: %s\nshape_friendlyscary: %s\ncover: (%s, %s)" % [emotion_happycry, shape_friendlyscary, left_hand_cover, right_hand_cover]
@@ -64,8 +66,9 @@ func _process(delta):
 	emit_signal("emotion_update", emotion_happycry)
 	emit_signal("shapeshifter_update", shape_friendlyscary)
 	emit_signal("baby_looked_at", baby_looked)
+	emit_signal("hands_update", left_hand_cover, right_hand_cover)
 
-func interact_with_kiddo(delta):
+func interact_with_kiddo():
 	var e = Vector2(emotion_happycry, 0)
 	var s = Vector2(shape_friendlyscary, 0)
 	emotion_happycry = e.move_toward(s, uncover_timer*0.02).x

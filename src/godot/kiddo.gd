@@ -33,6 +33,7 @@ var emotion_happycry = 0
 var baby_looked = false
 
 var openness_noise = OpenSimplexNoise.new()
+var eyesmove_noise = OpenSimplexNoise.new()
 
 var timer = 0
 
@@ -52,6 +53,11 @@ func _ready():
 	openness_noise.octaves = 2
 	openness_noise.period = 1.0
 	openness_noise.persistence = 0.3
+	
+	eyesmove_noise.seed = randi()
+	eyesmove_noise.octaves = 3
+	eyesmove_noise.period = 1.0
+	eyesmove_noise.persistence = 0.3
 	
 	openness_node = get_node(openness_text)
 	openness_node.visible = false
@@ -221,7 +227,7 @@ func draw_eyes(head_radius):
 	var left_eye_pos = Vector2.ZERO
 	
 	if !baby_looked:
-		left_eye_pos = Vector2(openness_noise.get_noise_1d(timer)*30, 0)
+		left_eye_pos = Vector2(eyesmove_noise.get_noise_1d(timer)*35, 0)
 	
 	var right_center = Vector2(head_radius * eye_separation_factor, -head_radius * eye_level_factor) + face_offset
 	var right_size = left_size
